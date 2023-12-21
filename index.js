@@ -1,7 +1,9 @@
 const express = require('express');
 const app = express();
 const path = require('path');
-const fs = require('fs'); // Import the 'fs' module for file system operations
+const fs = require('fs'); 
+app.use(express.static('public', { 'extensions': ['html', 'css'] }));
+
 
 app.listen(8080, () => {
     console.log("Server is listening on port 8080");

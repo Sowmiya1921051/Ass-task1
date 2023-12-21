@@ -4,49 +4,131 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JSON Data Display</title>
-    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        tr:hover {
+            background-color: #ddd;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
-        <h1>JSON Data Display</h1>
+        <h1>JSON Data Display..!</h1>
         <div id="data-container"></div>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            fetchData();
-        });
-
-        async function fetchData() {
-            try {
-                const response = await fetch('/data');
-                const jsonData = await response.json();
-
-                const dataContainer = document.getElementById('data-container');
-                const table = document.createElement('table');
-                const headerRow = table.createTHead().insertRow(0);
-
-                // Create table headers
-                Object.keys(jsonData.data[0]).forEach(key => {
-                    const th = document.createElement('th');
-                    th.textContent = key;
-                    headerRow.appendChild(th);
+      document.addEventListener('DOMContentLoaded', function () {
+        fetchData();
+    });
+    
+    async function fetchData() {
+        try {
+            const response = await fetch('/data');
+            const jsonData = await response.json();
+    
+            const dataContainer = document.getElementById('data-container');
+    
+          
+            const table = document.createElement('table');
+            const headerRow = table.createTHead().insertRow(0);
+    
+            Object.keys(jsonData.data[0]).forEach(key => {
+                const th = document.createElement('th');
+                th.textContent = key;
+                headerRow.appendChild(th);
+            });
+    
+            jsonData.data.forEach(item => {
+                const row = table.insertRow();
+                Object.values(item).forEach(value => {
+                    const cell = row.insertCell();
+                    cell.textContent = value;
                 });
-
-                // Create table rows
-                jsonData.data.forEach(item => {
-                    const row = table.insertRow();
-                    Object.values(item).forEach(value => {
-                        const cell = row.insertCell();
-                        cell.textContent = value;
-                    });
+            });
+    
+            dataContainer.appendChild(table);
+    
+            
+            const summaryTable = document.createElement('table');
+            const summaryTbody = document.createElement('tbody');
+    
+            
+            const bloodGroups = {};
+            jsonData.data.forEach(item => {
+                const bloodGroup = item['bloodGroup'];
+                if (!bloodGroups[bloodGroup]) {
+                    bloodGroups[bloodGroup] = [];
+                }
+                bloodGroups[bloodGroup].push(item);
+            });
+    
+            Object.keys(bloodGroups).forEach(bloodGroup => {
+                const bloodGroupRow = summaryTbody.insertRow();
+                const bloodGroupCell = bloodGroupRow.insertCell();
+                bloodGroupCell.textContent = bloodGroup;
+    
+                const namesCell = bloodGroupRow.insertCell();
+                const namesList = document.createElement('ul');
+                bloodGroups[bloodGroup].forEach(person => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = person.name;
+                    namesList.appendChild(listItem);
                 });
-
-                dataContainer.appendChild(table);
-            } catch (error) {
-                console.error('Error fetching data:', error);
-            }
+                namesCell.appendChild(namesList);
+            });
+    
+            summaryTable.appendChild(summaryTbody);
+            document.body.appendChild(summaryTable);
+        } catch (error) {
+            console.error('Error fetching data:', error);
         }
+    }
+    
+    
+        
     </script>
+    
 </body>
 </html>
