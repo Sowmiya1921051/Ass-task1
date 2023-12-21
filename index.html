@@ -3,9 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>JSON Data Display</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    
+    <div class="container">
+        <h1>JSON Data Display</h1>
+        <div id="data-container"></div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            fetchData();
+        });
+
+        async function fetchData() {
+            try {
+                const response = await fetch('/data');
+                const jsonData = await response.json();
+
+                const dataContainer = document.getElementById('data-container');
+                const table = document.createElement('table');
+                const headerRow = table.createTHead().insertRow(0);
+
+                // Create table headers
+                Object.keys(jsonData.data[0]).forEach(key => {
+                    const th = document.createElement('th');
+                    th.textContent = key;
+                    headerRow.appendChild(th);
+                });
+
+                // Create table rows
+                jsonData.data.forEach(item => {
+                    const row = table.insertRow();
+                    Object.values(item).forEach(value => {
+                        const cell = row.insertCell();
+                        cell.textContent = value;
+                    });
+                });
+
+                dataContainer.appendChild(table);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        }
+    </script>
 </body>
 </html>
